@@ -12,9 +12,9 @@ function Gameboard() {
 
     const getBoard = () => board;
 
-    const placeToken = (row, col, player) => {
+    const placeToken = (row, col, playerToken) => {
         if(!board[row][col].getValue() === '*') return; 
-        board[row][col].addToken(player);
+        board[row][col].addToken(playerToken);
     };
 
     const printBoard = () => {
@@ -23,4 +23,16 @@ function Gameboard() {
     };
 
     return {getBoard, placeToken, printBoard};
+}
+
+function Cell() {
+    let value = '*';
+
+    const addToken = (playerToken) => {
+        value = playerToken;
+    }
+
+    const getValue = () => value;
+
+    return {addToken, getValue};
 }
