@@ -1,0 +1,22 @@
+.board {
+    height: 300px;
+    width: 300px;
+    border: 1px solid #000;
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    grid-template-rows: repeat(3,1fr);
+    /* gap: 2px; */
+}
+
+.board > button {
+    padding: 0;
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #000;
+    background: #a3a3a3;
+    color: white;
+    font-size: 3rem;
+
+}
