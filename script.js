@@ -72,9 +72,28 @@ function GameController(playerOneName = `Player 1`, playerTwoName = `Player 2`) 
         console.log(`${getActivePlayer().name}'s turn.`);
     };
 
+    
+    let isGameOver = false;
+    let isGameDraw = false;
+    
+    const  getIsGameOver = () => isGameOver;
+    const  getIsGameDraw = () => isGameDraw;
+    
+    const setIsGameOver = (value) => {
+        isGameOver = value;
+    }
+    
+    const setIsGameDraw = (value) => {
+        isGameDraw = value;
+    }
+    
     const resetGame = () => {
         gameBoard.resetBoard();
+        setIsGameDraw(false);
+        setIsGameOver(false);
+        activePlayer = players[0];
         console.log(`Reset Game`);
+        gameBoard.printBoard();
     }
 
     const playRound = (row, col) => {
@@ -96,16 +115,11 @@ function GameController(playerOneName = `Player 1`, playerTwoName = `Player 2`) 
                 (getBoard[0][index].getValue() !== `*`));
             }); 
 
-            // console.log(winningCol);
-            // console.log(winningCol.length);
-            // console.log(winningRow.length);
             if(winningRow.length || winningCol.length) {
                 gameBoard.printBoard();
                 console.log(`${getActivePlayer().name} wins!!`);
-                activePlayer = players[0];
-                resetGame();
-                printNewRound();
-                return;
+                isGameOver = true;
+                return; 
             }
             
             //diagonal win conditions
@@ -119,9 +133,7 @@ function GameController(playerOneName = `Player 1`, playerTwoName = `Player 2`) 
             ){
                 gameBoard.printBoard();
                 console.log(`${getActivePlayer().name} wins!!`);
-                activePlayer = players[0];
-                resetGame();
-                printNewRound();
+                isGameOver = true;
                 return;
             }
     
@@ -132,9 +144,7 @@ function GameController(playerOneName = `Player 1`, playerTwoName = `Player 2`) 
             if(drawBoard.length == 0) {
                 gameBoard.printBoard();
                 console.log(`It's a Draw.`);
-                activePlayer = players[0];
-                resetGame();
-                printNewRound();
+                isGameDraw = true;
                 return;
             }
     
@@ -148,5 +158,69 @@ function GameController(playerOneName = `Player 1`, playerTwoName = `Player 2`) 
 
     printNewRound();
     
-    return {playRound, getActivePlayer, getBoard};
+    return {playRound, getActivePlayer, getIsGameOver, getIsGameDraw ,getBoard, resetGame};
 }
+
+function DisplayController() {
+    const game = GameController();;
+    const turnDisplay = document.querySelector('.turn');
+    const boardDiv = document.querySelector('.board');
+    const resetBtn = document.querySelector('.reset');
+    
+    const updateScreen = () => {
+        boardDiv.textContent = '';
+        const board = game.getBoard;
+
+        if(game.getIsGameOver() || game.getIsGameDraw()){
+            
+            if(game.getIsGameOver()){
+                turnDisplay.textContent = `${game.getActivePlayer().name} wins!!`;
+            }
+    
+            else{
+                turnDisplay.textContent = `It's a Draw.`;
+            }
+        }
+        else {
+            turnDisplay.textContent = `${game.getActivePlayer().name}'s Turn`;
+        }
+        
+        board.forEach((row,rowIndex) => {
+            row.forEach((cell,colIndex)=> {
+                const cellBtn = document.createElement('button');
+                cellBtn.classList.add('token');
+                cellBtn.dataset.row = rowIndex;
+                cellBtn.dataset.col = colIndex;
+                if(!(cell.getValue() === '*')) cellBtn.textContent = cell.getValue();
+                boardDiv.appendChild(cellBtn);
+            })
+        })
+    }
+
+    boardDiv.addEventListener('click', (event) => {
+        if((!game.getIsGameOver()) && (!game.getIsGameDraw()) ){
+            
+            const selectedCellRow = event.target.dataset.row;
+            const selectedCellCol = event.target.dataset.col;
+            if(!(selectedCellRow || selectedCellCol)) return;
+            game.playRound(selectedCellRow,selectedCellCol)
+            updateScreen();
+        }
+    })
+
+    resetBtn.addEventListener('click', () => {
+        game.resetGame();
+        const cellBtns = document.querySelectorAll('.token');
+        cellBtns.forEach((cell) =>{
+            cell.textContent = '';
+        })
+        updateScreen();
+    })
+
+    //Initialize board display
+    updateScreen();
+
+
+}
+
+DisplayController();
